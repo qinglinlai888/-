@@ -1,2 +1,1 @@
 data_mrna_seq_v2_rsem_zscores_ref_all_samples.txt filter=lfs diff=lfs merge=lfs -text
-data_multiomics_merged.csv filter=lfs diff=lfs merge=lfs -text

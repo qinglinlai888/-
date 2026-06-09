@@ -1,6 +1,40 @@
+# Python
 __pycache__/
 *.py[cod]
-.ipynb_checkpoints/
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
 .venv/
 venv/
+env/
 .env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+~$*
+
+# Generated analysis outputs
+data_clinical_cleaned.csv
+data_multiomics_merged.csv
+umap_visualization.png
