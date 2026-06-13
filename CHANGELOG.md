@@ -4,6 +4,17 @@
 
 ## 2026-06-13
 
+### 表达矩阵清洗与重新安全合并
+
+- 新增 `src/data/clean_expression.py`，自动定位并读取原始 mRNA 表达矩阵。
+- 过滤 368 个在所有样本中完全缺失的基因行。
+- 排除全缺失过滤后仍无法命名的 11 个缺失 gene symbol 行。
+- 对 7 个重复 gene symbol 使用 mean 聚合，生成 `data/processed/expression_cleaned.csv`。
+- 生成 `reports/data_quality/expression_cleaning_report.md`。
+- 未执行 `fillna(0)`、全局中位数填补或其他缺失值插补；清洗后实际剩余表达缺失值为 0。
+- 修改 `merge_omics.py`，强制使用 `data/processed/expression_cleaned.csv`。
+- 重新安全合并结果为 `514 × 20201`。
+
 ### 安全三表合并与项目文档更新
 
 - 最小修改主线合并脚本 `merge_omics.py`，未修改包含旧流程的 Notebook。

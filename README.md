@@ -8,8 +8,9 @@
 
 - 读取 patient、sample 和 mRNA 表达数据
 - 按 TCGA 条码前 12 位完成患者级对齐
-- 转置 mRNA 表达矩阵并完成三表内连接
-- 使用清洗后的 patient 表生成 `data/processed/data_multiomics_merged.csv`
+- 过滤全缺失基因，并按 mean 聚合重复 gene symbol
+- 使用清洗后的 patient 和 expression 数据完成三表内连接
+- 生成 `data/processed/data_multiomics_merged.csv`
 - 完成年龄、分级、TP53、PCA 和部分 UMAP EDA
 
 当前处于数据清洗与安全合并阶段。尚未进入正式模型训练。
@@ -25,12 +26,13 @@
 | `data_test.py` | 三张原始表读取冒烟检查 |
 | `src/data/clean_patient.py` | patient 表保守清洗与质量报告 |
 | `src/data/check_expression_quality.py` | 表达矩阵重复基因和缺失值质量检查 |
+| `src/data/clean_expression.py` | 过滤全缺失基因并按 mean 聚合重复 gene symbol |
 | `src/features/feature_column_rules.py` | 基于列名的泄露风险防护规则 |
-| `merge_omics.py` | 使用清洗 patient 表执行安全三表合并 |
+| `merge_omics.py` | 使用清洗 patient 与 expression 表执行安全三表合并 |
 | `01_Data_Prep_and_Merging.ipynb` | 数据准备与合并 Notebook |
 | `02_EDA_and_Visualization.ipynb` | EDA 与降维 Notebook |
 
-生成的 `data/processed/patient_cleaned.csv`、`data/processed/data_multiomics_merged.csv`、旧根目录生成 CSV 和 `umap_visualization.png` 已被 `.gitignore` 忽略。
+生成的 `data/processed/patient_cleaned.csv`、`data/processed/expression_cleaned.csv`、`data/processed/data_multiomics_merged.csv`、旧根目录生成 CSV 和 `umap_visualization.png` 已被 `.gitignore` 忽略。
 
 ## 基础运行
 
@@ -46,10 +48,13 @@ python data_test.py
 ```powershell
 python src/data/clean_patient.py
 python src/data/check_expression_quality.py
+python src/data/clean_expression.py
 python merge_omics.py
 ```
 
-`merge_omics.py` 强制读取 `data/processed/patient_cleaned.csv`。若清洗结果不存在，脚本会停止并提示先运行 patient 清洗。
+`clean_expression.py` 过滤全缺失基因、排除无法命名的基因行，并按 mean 聚合重复 gene symbol；它不会执行全局缺失值填补。
+
+`merge_omics.py` 强制读取 `data/processed/patient_cleaned.csv` 和 `data/processed/expression_cleaned.csv`。任一清洗结果不存在时，脚本会停止并提示先运行对应清洗脚本。
 
 ## 特征选择安全规则
 

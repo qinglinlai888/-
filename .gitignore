@@ -39,4 +39,5 @@ data_clinical_cleaned.csv
 data_multiomics_merged.csv
 umap_visualization.png
 data/processed/patient_cleaned.csv
+data/processed/expression_cleaned.csv
 data/processed/data_multiomics_merged.csv
