@@ -1,8 +1,30 @@
 import pandas as pd
 import numpy as np
-df_patient = pd.read_csv('data_clinical_patient.txt', sep='\t', comment='#')
+from pathlib import Path
+
+patient_path = Path('data/processed/patient_cleaned.csv')
+output_path = Path('data/processed/data_multiomics_merged.csv')
+if not patient_path.is_file():
+    raise FileNotFoundError(
+        "Cleaned patient table not found. Run: python src/data/clean_patient.py"
+    )
+
+df_patient = pd.read_csv(patient_path)
 df_sample = pd.read_csv('data_clinical_sample.txt', sep='\t', comment='#')
 df_mrna = pd.read_csv('data_mrna_seq_v2_rsem_zscores_ref_all_samples.txt', sep='\t', comment='#')
+print(f"patient 表 shape: {df_patient.shape}")
+print(f"sample 表 shape: {df_sample.shape}")
+print(f"expression 表 shape: {df_mrna.shape}")
+
+if 'PATIENT_ID' not in df_patient.columns:
+    raise KeyError("清洗后的 patient 表缺少 PATIENT_ID。")
+if df_patient['PATIENT_ID'].isna().any() or df_patient['PATIENT_ID'].duplicated().any():
+    raise ValueError("清洗后的 patient 表存在缺失或重复 PATIENT_ID，停止合并。")
+if 'SAMPLE_ID' not in df_sample.columns:
+    raise KeyError("sample 表缺少 SAMPLE_ID。")
+if 'Hugo_Symbol' not in df_mrna.columns:
+    raise KeyError("expression 表缺少 Hugo_Symbol。")
+
 df_sample['PATIENT_ID'] = df_sample['SAMPLE_ID'].str[:12]
 print("样本表与患者表主键ID已完成12位对齐")
 df_mrna_clean = df_mrna.dropna(subset=['Hugo_Symbol'])
@@ -23,4 +45,6 @@ for col in required_col:
         print(f"关键列 {col} 在最终数据集中存在")
 if 'IDH1' in df_super.columns and 'TP53' in df_super.columns:
     print("基因表达数据已成功整合到最终数据集中")
-df_super.to_csv('data_multiomics_merged.csv', index=False)
+output_path.parent.mkdir(parents=True, exist_ok=True)
+df_super.to_csv(output_path, index=False)
+print(f"安全合并结果已保存到: {output_path}")
